@@ -20,11 +20,22 @@ public class FollowCam : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // A single-line if statement doesn't require braces
-        if (POI == null) return; // if there is no POI, then return
+        Vector3 destination = Vector3.zero;
 
-        // Get the position of the poi
-        Vector3 destination = POI.transform.position;
+        if (POI != null)
+        {
+            // If the POI has a Rigidbody, check to see if it is sleeping
+            Rigidbody poiRigid = POI.GetComponent<Rigidbody>();
+            if ((poiRigid != null) && poiRigid.IsSleeping())
+            {
+                POI = null;
+            }
+        }
+
+        if (POI != null)
+        {
+            destination = POI.transform.position;
+        }
 
         // Limit the minimum values of destination.x and destination.y
         destination.x = Mathf.Max(minXY.x, destination.x);
@@ -38,5 +49,7 @@ public class FollowCam : MonoBehaviour
 
         // Set the camera to the destination
         transform.position = destination;
+        // Set the orthographicSize of the Camera to keep Ground in view
+        Camera.main.orthographicSize = destination.y + 10;
     }
 }
